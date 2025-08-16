@@ -128,6 +128,7 @@ ENV     PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${P
 
 RUN     brew update && brew upgrade && brew cleanup
 
+USER root
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY --from=ghcr.io/mccutchen/go-httpbin /bin/go-httpbin /bin/httpbin
