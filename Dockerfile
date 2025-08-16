@@ -126,3 +126,31 @@ RUN     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubuserconten
 ENV     PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
 
 RUN     brew update && brew upgrade && brew cleanup
+
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/mccutchen/go-httpbin /bin/go-httpbin /bin/httpbin
+RUN chmod +x /bin/httpbin
+RUN curl  -L --output /code.tar.gz "https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64"
+RUN tar xvf /code.tar.gz
+RUN mv code /bin/code
+RUN chmod +x /bin/code
+RUN rm -f code.tar.gz
+
+RUN chsh -s /bin/zsh ubuntu
+
+USER ubuntu
+
+WORKDIR /home/ubuntu
+ENV VSCODE_CLI_USE_FILE_KEYCHAIN=1
+ENV VSCODE_CLI_DISABLE_KEYCHAIN_ENCRYPT=1
+
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.zshrc" SHELL="$(which zsh)" zsh -
+
+EXPOSE 8000
+COPY --chown=ubuntu:ubuntu tunnel.sh /home/ubuntu/tunnel.sh
+RUN chmod +x /home/ubuntu/tunnel.sh
+
+CMD ["/home/ubuntu/tunnel.sh"]
+
+# https://github.com/microsoft/vscode/issues/170013#issuecomment-1787378725
