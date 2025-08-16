@@ -5,12 +5,6 @@ ENV     TZ=Europe/Paris
 RUN     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 ENV     DEBIAN_FRONTEND=noninteractive
 
-RUN     userdel -r ubuntu
-
-RUN     useradd -m -d /home/ubuntu -s /bin/zsh -u 1000 ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu
-
-COPY    --chown=ubuntu:ubuntu zshrc /home/ubuntu/.zshrc
-
 RUN     apt-get update \
   &&      apt-get install -y --no-install-recommends \
   acl \
@@ -119,6 +113,13 @@ RUN     apt-get update \
   &&      apt upgrade -y \
   &&      apt-get autoremove --purge -y \
   &&      rm -rf /var/lib/apt/lists/*
+
+
+RUN     userdel -r ubuntu
+
+RUN     useradd -m -d /home/ubuntu -s /bin/zsh -u 1000 ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu
+
+COPY    --chown=ubuntu:ubuntu zshrc /home/ubuntu/.zshrc
 
 USER    ubuntu
 
